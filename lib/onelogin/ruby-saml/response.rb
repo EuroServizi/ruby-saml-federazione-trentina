@@ -1,6 +1,10 @@
 require "xml_security"
 require "time"
 require "nokogiri"
+require 'ruby-debug'
+require "base64"
+require "openssl"
+require "digest/sha1"
 
 # Only supports SAML 2.0
 module Onelogin
@@ -17,7 +21,6 @@ module Onelogin
         raise ArgumentError.new("Response cannot be nil") if response.nil?
         self.options  = options
         self.response = response
-
         begin
           self.document = XMLSecurity::SignedDocument.new(Base64.decode64(response))
         rescue REXML::ParseException => e
@@ -27,6 +30,7 @@ module Onelogin
             raise e
           end
         end
+        
       end
 
       def is_valid?
@@ -40,8 +44,10 @@ module Onelogin
       # The value of the user identifier as designated by the initialization request response
       def name_id
         @name_id ||= begin
-          node = REXML::XPath.first(document, "/p:Response/a:Assertion[@ID='#{document.signed_element_id}']/a:Subject/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
-          node ||=  REXML::XPath.first(document, "/p:Response[@ID='#{document.signed_element_id}']/a:Assertion/a:Subject/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
+          # non va..  node = REXML::XPath.first(document, "/saml2p:Response/saml2:Assertion[@ID='#{document.signed_element_id}']/saml2:Subject/saml2:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
+          node = REXML::XPath.first(document, "/saml2p:Response/saml2:Assertion[@ID='#{document.signed_element_id}']/saml2:Subject/saml2:NameID")
+          #node ||=  REXML::XPath.first(document, "/p:Response[@ID='#{document.signed_element_id}']/a:Assertion/a:Subject/a:NameID", { "p" => PROTOCOL, "a" => ASSERTION })
+          node ||=  REXML::XPath.first(document, "/saml2p:Response[@ID='#{document.signed_element_id}']/saml2:Assertion/saml2:Subject/saml2:NameID")
           node.nil? ? nil : node.text
         end
       end
@@ -106,13 +112,36 @@ module Onelogin
         raise ValidationError.new(message)
       end
 
-      def validate(soft = true)
-        validate_structure(soft)      &&
-        validate_response_state(soft) &&
-        validate_conditions(soft)     &&
-        document.validate(get_fingerprint, soft) && 
-        success?
-      end
+      # def validate(soft = true)
+      #   debugger
+      #   val = validate_structure(soft) && validate_response_state(soft) && validate_conditions(soft) && document.validate(get_fingerprint, soft) && success?
+      #   val
+      # end
+
+    def validate(soft = true)
+        # prime the IdP metadata before the document validation. 
+        # The idp_cert needs to be populated before the validate_response_state method
+        
+        if settings 
+          Onelogin::Saml::Metadata.new(settings).get_idp_metadata
+        end
+          return false if validate_structure(soft) == false
+          return false if validate_response_state(soft) == false
+          return false if validate_conditions(soft) == false
+        
+        # Just in case a user needs to toss out the signature validation,
+        # I'm adding in an option for it.  (Sometimes canonicalization is a bitch!)
+        return true if settings.skip_validation == true
+        
+        # document.validte populates the idp_cert
+          return false if document.validate(get_fingerprint, soft) == false
+        
+        # validate response code
+        return false if success? == false  
+
+        return true
+    end
+
 
       def validate_structure(soft = true)
         Dir.chdir(File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'schemas'))) do
@@ -144,11 +173,13 @@ module Onelogin
 
       def get_fingerprint
         if settings.idp_cert
-          cert = OpenSSL::X509::Certificate.new(settings.idp_cert)
+          cert_text = Base64.decode64(settings.idp_cert)
+          cert = OpenSSL::X509::Certificate.new(cert_text)
           Digest::SHA1.hexdigest(cert.to_der).upcase.scan(/../).join(":")
         else
           settings.idp_cert_fingerprint
         end
+        
       end
 
       def validate_conditions(soft = true)
