@@ -4,9 +4,9 @@ class RequestTest < Test::Unit::TestCase
 
   context "Authrequest" do
     should "create the deflated SAMLRequest URL parameter" do
-      settings = Onelogin::Saml::Settings.new
+      settings = FederazioneTrentina::Saml::Settings.new
       settings.idp_sso_target_url = "http://example.com"
-      auth_url = Onelogin::Saml::Authrequest.new.create(settings)
+      auth_url = FederazioneTrentina::Saml::Authrequest.new.create(settings)
       assert auth_url =~ /^http:\/\/example\.com\?SAMLRequest=/
       payload  = CGI.unescape(auth_url.split("=").last)
       decoded  = Base64.decode64(payload)
@@ -20,32 +20,32 @@ class RequestTest < Test::Unit::TestCase
     end
 
     should "accept extra parameters" do
-      settings = Onelogin::Saml::Settings.new
+      settings = FederazioneTrentina::Saml::Settings.new
       settings.idp_sso_target_url = "http://example.com"
 
-      auth_url = Onelogin::Saml::Authrequest.new.create(settings, { :hello => "there" })
+      auth_url = FederazioneTrentina::Saml::Authrequest.new.create(settings, { :hello => "there" })
       assert auth_url =~ /&hello=there$/
 
-      auth_url = Onelogin::Saml::Authrequest.new.create(settings, { :hello => nil })
+      auth_url = FederazioneTrentina::Saml::Authrequest.new.create(settings, { :hello => nil })
       assert auth_url =~ /&hello=$/
     end
 
     context "when the target url doesn't contain a query string" do
       should "create the SAMLRequest parameter correctly" do
-        settings = Onelogin::Saml::Settings.new
+        settings = FederazioneTrentina::Saml::Settings.new
         settings.idp_sso_target_url = "http://example.com"
   
-        auth_url = Onelogin::Saml::Authrequest.new.create(settings)
+        auth_url = FederazioneTrentina::Saml::Authrequest.new.create(settings)
         assert auth_url =~ /^http:\/\/example.com\?SAMLRequest/
       end
     end
 
     context "when the target url contains a query string" do
       should "create the SAMLRequest parameter correctly" do
-        settings = Onelogin::Saml::Settings.new
+        settings = FederazioneTrentina::Saml::Settings.new
         settings.idp_sso_target_url = "http://example.com?field=value"
   
-        auth_url = Onelogin::Saml::Authrequest.new.create(settings)
+        auth_url = FederazioneTrentina::Saml::Authrequest.new.create(settings)
         assert auth_url =~ /^http:\/\/example.com\?field=value&SAMLRequest/
       end
     end

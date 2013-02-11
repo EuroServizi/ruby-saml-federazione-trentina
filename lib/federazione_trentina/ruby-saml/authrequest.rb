@@ -7,7 +7,7 @@ require "rexml/xpath"
 require "rubygems"
 require "addressable/uri"
 
-module Onelogin::Saml
+module FederazioneTrentina::Saml
   include REXML
   class Authrequest
     # a few symbols for SAML class names

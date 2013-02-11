@@ -8,7 +8,7 @@ require "digest/md5"
 # Return this XML in a controller, then give that URL to the the 
 # IdP administrator.  The IdP will poll the URL and your settings
 # will be updated automatically
-module Onelogin
+module FederazioneTrentina
   module Saml
     class Metadata
       include REXML

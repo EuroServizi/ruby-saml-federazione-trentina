@@ -1,5 +1,5 @@
 # Simplistic log class when we're running in Rails
-module Onelogin
+module FederazioneTrentina
   module Saml
     class Logging
       def self.debug(message)

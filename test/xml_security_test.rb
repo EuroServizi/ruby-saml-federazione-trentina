@@ -15,7 +15,7 @@ class XmlSecurityTest < Test::Unit::TestCase
     end
 
     should "should run validate with throwing NS related exceptions" do
-      assert_raise(Onelogin::Saml::ValidationError) do
+      assert_raise(FederazioneTrentina::Saml::ValidationError) do
         @document.validate_doc(@base64cert, false)
       end
     end
@@ -27,14 +27,14 @@ class XmlSecurityTest < Test::Unit::TestCase
     end
 
     should "should raise Fingerprint mismatch" do
-      exception = assert_raise(Onelogin::Saml::ValidationError) do
+      exception = assert_raise(FederazioneTrentina::Saml::ValidationError) do
         @document.validate("no:fi:ng:er:pr:in:t", false)
       end
       assert_equal("Fingerprint mismatch", exception.message)
     end
 
     should "should raise Digest mismatch" do
-      exception = assert_raise(Onelogin::Saml::ValidationError) do
+      exception = assert_raise(FederazioneTrentina::Saml::ValidationError) do
         @document.validate_doc(@base64cert, false)
       end
       assert_equal("Digest mismatch", exception.message)
@@ -46,7 +46,7 @@ class XmlSecurityTest < Test::Unit::TestCase
                     "<ds:DigestValue>b9xsAXLsynugg3Wc1CI3kpWku+0=</ds:DigestValue>")
       document = XMLSecurity::SignedDocument.new(response)
       base64cert = document.elements["//ds:X509Certificate"].text
-      exception = assert_raise(Onelogin::Saml::ValidationError) do
+      exception = assert_raise(FederazioneTrentina::Saml::ValidationError) do
         document.validate_doc(base64cert, false)
       end
       assert_equal("Key validation error", exception.message)
@@ -96,10 +96,10 @@ class XmlSecurityTest < Test::Unit::TestCase
 
       should_eventually 'support inclusive canonicalization' do
 
-        response = Onelogin::Saml::Response.new(fixture("tdnf_response.xml"))
+        response = FederazioneTrentina::Saml::Response.new(fixture("tdnf_response.xml"))
         response.stubs(:conditions).returns(nil)
         assert !response.is_valid?
-        settings = Onelogin::Saml::Settings.new
+        settings = FederazioneTrentina::Saml::Settings.new
         assert !response.is_valid?
         response.settings = settings
         assert !response.is_valid?

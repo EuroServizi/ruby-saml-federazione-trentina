@@ -1,7 +1,7 @@
 require "cgi"
 require 'zlib'
 
-module Onelogin
+module FederazioneTrentina
   module Saml
     module Coding
       def decode(encoded)

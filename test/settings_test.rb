@@ -4,7 +4,7 @@ class SettingsTest < Test::Unit::TestCase
 
   context "Settings" do
     setup do
-      @settings = Onelogin::Saml::Settings.new
+      @settings = FederazioneTrentina::Saml::Settings.new
     end
     should "should provide getters and settings" do
       accessors = [
@@ -31,7 +31,7 @@ class SettingsTest < Test::Unit::TestCase
           :idp_cert_fingerprint => "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00",
           :name_identifier_format => "urn:oasis:names:tc:SAML:2.0:nameid-format:transient",
       }
-      @settings = Onelogin::Saml::Settings.new(config)
+      @settings = FederazioneTrentina::Saml::Settings.new(config)
 
       config.each do |k,v|
         assert_equal v, @settings.send(k)

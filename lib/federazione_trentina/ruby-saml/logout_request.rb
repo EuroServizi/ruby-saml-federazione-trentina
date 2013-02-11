@@ -1,6 +1,6 @@
 require 'uuid'
 
-module Onelogin::Saml
+module FederazioneTrentina::Saml
   class LogoutRequest
     ASSERTION = "urn:oasis:names:tc:SAML:2.0:assertion"
     PROTOCOL  = "urn:oasis:names:tc:SAML:2.0:protocol"
@@ -14,7 +14,7 @@ module Onelogin::Saml
     def initialize( options = {} )
       opt = {  :request => nil, :settings => nil  }.merge(options)
       @settings = opt[:settings]
-      @issue_instant = Onelogin::Saml::LogoutRequest.timestamp
+      @issue_instant = LogoutRequest.timestamp
       @request_params = Hash.new
        # We need to generate a LogoutRequest to send to the IdP
       if opt[:request].nil?

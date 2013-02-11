@@ -3,11 +3,11 @@ require File.expand_path(File.join(File.dirname(__FILE__), "test_helper"))
 class RequestTest < Test::Unit::TestCase
 
   context "Logoutrequest" do
-    settings = Onelogin::Saml::Settings.new
+    settings = FederazioneTrentina::Saml::Settings.new
 
     should "create the deflated SAMLRequest URL parameter" do
       settings.idp_slo_target_url = "http://unauth.com/logout"
-      unauth_url = Onelogin::Saml::Logoutrequest.new.create(settings)
+      unauth_url = FederazioneTrentina::Saml::Logoutrequest.new.create(settings)
       assert unauth_url =~ /^http:\/\/unauth\.com\/logout\?SAMLRequest=/
 
       inflated = decode_saml_request_payload(unauth_url)
@@ -17,10 +17,10 @@ class RequestTest < Test::Unit::TestCase
 
     should "support additional params" do
 
-      unauth_url = Onelogin::Saml::Logoutrequest.new.create(settings, { :hello => nil })
+      unauth_url = FederazioneTrentina::Saml::Logoutrequest.new.create(settings, { :hello => nil })
       assert unauth_url =~ /&hello=$/
 
-      unauth_url = Onelogin::Saml::Logoutrequest.new.create(settings, { :foo => "bar" })
+      unauth_url = FederazioneTrentina::Saml::Logoutrequest.new.create(settings, { :foo => "bar" })
       assert unauth_url =~ /&foo=bar$/
     end
 
@@ -29,7 +29,7 @@ class RequestTest < Test::Unit::TestCase
       sessionidx = UUID.new.generate
       settings.sessionindex = sessionidx
 
-      unauth_url = Onelogin::Saml::Logoutrequest.new.create(settings, { :name_id => "there" })
+      unauth_url = FederazioneTrentina::Saml::Logoutrequest.new.create(settings, { :name_id => "there" })
       inflated = decode_saml_request_payload(unauth_url)
 
       assert_match /<samlp:SessionIndex/, inflated
@@ -37,13 +37,13 @@ class RequestTest < Test::Unit::TestCase
     end
 
     should "set name_identifier_value" do
-      settings = Onelogin::Saml::Settings.new
+      settings = FederazioneTrentina::Saml::Settings.new
       settings.idp_slo_target_url = "http://example.com"
       settings.name_identifier_format = "transient"
       name_identifier_value = "abc123"
       settings.name_identifier_value = name_identifier_value
 
-      unauth_url = Onelogin::Saml::Logoutrequest.new.create(settings, { :name_id => "there" })
+      unauth_url = FederazioneTrentina::Saml::Logoutrequest.new.create(settings, { :name_id => "there" })
       inflated = decode_saml_request_payload(unauth_url)
 
       assert_match /<saml:NameID/, inflated
@@ -52,30 +52,30 @@ class RequestTest < Test::Unit::TestCase
 
     context "when the target url doesn't contain a query string" do
       should "create the SAMLRequest parameter correctly" do
-        settings = Onelogin::Saml::Settings.new
+        settings = FederazioneTrentina::Saml::Settings.new
         settings.idp_slo_target_url = "http://example.com"
 
-        unauth_url = Onelogin::Saml::Logoutrequest.new.create(settings)
+        unauth_url = FederazioneTrentina::Saml::Logoutrequest.new.create(settings)
         assert unauth_url =~ /^http:\/\/example.com\?SAMLRequest/
       end
     end
 
     context "when the target url contains a query string" do
       should "create the SAMLRequest parameter correctly" do
-        settings = Onelogin::Saml::Settings.new
+        settings = FederazioneTrentina::Saml::Settings.new
         settings.idp_slo_target_url = "http://example.com?field=value"
 
-        unauth_url = Onelogin::Saml::Logoutrequest.new.create(settings)
+        unauth_url = FederazioneTrentina::Saml::Logoutrequest.new.create(settings)
         assert unauth_url =~ /^http:\/\/example.com\?field=value&SAMLRequest/
       end
     end
 
     context "consumation of logout may need to track the transaction" do
       should "have access to the request uuid" do
-        settings = Onelogin::Saml::Settings.new
+        settings = FederazioneTrentina::Saml::Settings.new
         settings.idp_slo_target_url = "http://example.com?field=value"
 
-        unauth_req = Onelogin::Saml::Logoutrequest.new
+        unauth_req = FederazioneTrentina::Saml::Logoutrequest.new
         unauth_url = unauth_req.create(settings)
 
         inflated = decode_saml_request_payload(unauth_url)

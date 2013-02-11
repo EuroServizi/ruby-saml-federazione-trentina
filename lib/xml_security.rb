@@ -29,7 +29,7 @@ require "openssl"
 require 'nokogiri'
 require "digest/sha1"
 require "digest/sha2"
-require "onelogin/ruby-saml/validation_error"
+require "federazione_trentina/ruby-saml/validation_error"
 
 module XMLSecurity
 
@@ -55,7 +55,7 @@ module XMLSecurity
       fingerprint = Digest::SHA1.hexdigest(cert.to_der)
 
       if fingerprint != idp_cert_fingerprint.gsub(/[^a-zA-Z0-9]/,"").downcase
-        return soft ? false : (raise Onelogin::Saml::ValidationError.new("Fingerprint mismatch"))
+        return soft ? false : (raise FederazioneTrentina::Saml::ValidationError.new("Fingerprint mismatch"))
       end
 
       validate_doc(base64_cert, soft)
@@ -98,7 +98,7 @@ module XMLSecurity
         digest_value                  = Base64.decode64(REXML::XPath.first(ref, "//ds:DigestValue", {"ds"=>DSIG}).text)
 
         unless digests_match?(hash, digest_value)
-          return soft ? false : (raise Onelogin::Saml::ValidationError.new("Digest mismatch"))
+          return soft ? false : (raise FederazioneTrentina::Saml::ValidationError.new("Digest mismatch"))
         end
       end
 
@@ -113,7 +113,7 @@ module XMLSecurity
       signature_algorithm     = algorithm(REXML::XPath.first(signed_info_element, "//ds:SignatureMethod", {"ds"=>DSIG}))
 
       unless cert.public_key.verify(signature_algorithm.new, signature, canon_string)
-        return soft ? false : (raise Onelogin::Saml::ValidationError.new("Key validation error"))
+        return soft ? false : (raise FederazioneTrentina::Saml::ValidationError.new("Key validation error"))
       end
 
       return true

@@ -1,7 +1,7 @@
 
 # A few helper functions for assembling a SAMLRequest and 
 # sending it to the IdP
-module Onelogin::Saml
+module FederazioneTrentina::Saml
 	include Coding
 	module Request
 		
