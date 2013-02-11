@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.description = %q{SAML toolkit for Ruby programs to integrate with federazione PAT trentina }
   s.email = %q{fabiano.pavan@soluzionipa.it}
   s.files = `git ls-files`.split("\n")
-  s.homepage = %q{https://github.com/fabianopavan/ruby-saml}
+  s.homepage = %q{https://github.com/fabianopavan/ruby-saml-federazione-trentina}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.summary = %q{SAML Ruby Tookit}
