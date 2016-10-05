@@ -1,7 +1,6 @@
 require "xml_security"
 require "time"
 require "nokogiri"
-require 'ruby-debug'
 require "base64"
 require "openssl"
 require "digest/sha1"
